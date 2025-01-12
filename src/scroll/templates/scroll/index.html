@@ -1,42 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <title>Single Page</title>
-    <script>
-        window.onpopstate = function (event) {
-            if (event.state && event.state.section) {
-                showSection(event.state.section);
+    <head>
+        <meta charset="utf-8">
+        <title>API</title>
+
+        <style>
+            /* Container styling */
+            #posts {
+                max-width: 680px;
+                margin: 20px auto;
+                padding: 20px;
+                background-color: #f0f2f5;
             }
-        }
-
-        function showSection(section) {
-            fetch(`/sections/${section}`)  // Changed from sections to section
-            .then(response => response.text())
-            .then(text => {
-                document.querySelector('#content').innerHTML = text;
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function(){
-            document.querySelectorAll('button').forEach(button => {
-                button.onclick = function() {
-                    const section = this.dataset.section;
-                    history.pushState(
-                        {section: section},  // Changed from sections to section
-                        '', 
-                        `/sections/${section}`  // Added leading slash, changed from sections
-                    );
-                    showSection(section);
+    
+            /* Post card styling */
+            .post {
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+                margin-bottom: 16px;
+                padding: 16px;
+                transition: box-shadow 0.3s ease;
+            }
+    
+            .post:hover {
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+    
+            /* Post content styling */
+            .post-content {
+                color: #1c1e21;
+                font-size: 15px;
+                line-height: 1.5;
+                margin: 12px 0;
+            }
+    
+            /* Responsive design */
+            @media (max-width: 720px) {
+                #posts {
+                    margin: 10px;
+                    padding: 10px;
                 }
-            });
-        });
-    </script>
-</head>
-<body>
-    <h1>Hello!</h1>
-    <button data-section="1">Section 1</button>
-    <button data-section="2">Section 2</button>
-    <button data-section="3">Section 3</button>
-    <div id="content"></div>
-</body>
+                .post {
+                    margin-bottom: 12px;
+                    padding: 12px;
+                }
+            }
+        </style>
+        <script>
+            //Start with first post
+            let counter =1;
+
+            //Load post 20 at a time
+            const quantity = 50;
+
+            //When DOM loads, render the first 20 posts
+            document.addEventListener("DOMContentLoaded", load);
+
+            window.onscroll = () => {
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                    load();
+                }
+            }
+
+            //Load next set of posts
+            function load() {
+
+                // Set start and end post numbers, and update counter
+
+                const start = counter;
+                const end = start + quantity - 1;
+                counter = end + 1;
+
+                // Get new posts and add posts
+                fetch(`/scroll/posts?start=${start}&end=${end}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.posts.forEach(add_post);
+                });
+            };
+
+            // Add a new post whith hiven contents to DOM
+            function add_post(contents) {
+
+                //Create new post
+                const post = document.createElement("div");
+                post.className = "post";
+                post.innerHTML = contents;
+
+                // Add post to DOM
+                document.querySelector('#posts').append(post);
+            };
+            
+        </script>
+    </head>
+    <body>
+        <div id="posts">
+
+        </div>
+    </body>
 </html>
