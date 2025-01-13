@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React App</title>
+
+    <!-- React Production Dependencies -->
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- React will render here -->
+    </div>
+
+    <script type="text/babel">
+        // React component
+        
+
+            function Hello(param) {
+                return (<h1>Sum of 3 + 2 = {3 + 2} , {param.name}</h1>);
+            }
+            function App() {
+                return (
+                    <div>
+                        <Hello name="Harry"/>
+                        <Hello name="Ron"/>
+                        <Hello name="Hermione"/>
+                    </div>
+                );
+            }        
+
+        // Render the component
+        ReactDOM.render(<App />, document.getElementById('app'));
+    </script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>API</title>
+
+        <style>
+
+            @keyframes hide {
+                0% {
+                    opacity: 1;
+                    height: 100%;
+                    line-height: 100%;
+                    padding: 20px;
+                    margin-bottom: 10px;
+                }
+                75% {
+                    opacity: 0;
+                    height: 100%;
+                    line-height: 100%;
+                    padding: 20px;
+                    margin-bottom: 10px;
+                }
+                100% {
+                    opacity: 0;
+                    height: 0px;
+                    line-height: 0px;
+                    padding: 0px;
+                    margin-bottom: 0px;
+                }
+            }
+
+            /* Container styling */
+            #posts {
+                max-width: 680px;
+                margin: 20px auto;
+                padding: 20px;
+                background-color: #f0f2f5;
+            }
+    
+            /* Post card styling */
+            .post {
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+                margin-bottom: 16px;
+                padding: 16px;
+                transition: box-shadow 0.3s ease;
+                animation-name: hide;
+                animation-duration: 2s;
+                animation-fill-mode: forwards;
+                animation-play-state: paused;
+            }
+    
+            .post:hover {
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+    
+            /* Post content styling */
+            .post-content {
+                color: #1c1e21;
+                font-size: 15px;
+                line-height: 1.5;
+                margin: 12px 0;
+            }
+    
+            /* Responsive design */
+            @media (max-width: 720px) {
+                #posts {
+                    margin: 10px;
+                    padding: 10px;
+                }
+                .post {
+                    margin-bottom: 12px;
+                    padding: 12px;
+                }
+            }
+
+            /* Facebook-like button styling */
+            .hide {
+                background-color: #e4e6eb;
+                border: none;
+                border-radius: 6px;
+                color: #050505;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 600;
+                padding: 8px 12px;
+                margin-left: 8px;
+                transition: background-color 0.2s;
+            }
+
+            .hide:hover {
+                background-color: #d8dadf;
+            }
+
+            /* Post styling update */
+            .post {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            /* Responsive design */
+            @media (max-width: 720px) {
+                .hide {
+                    padding: 6px 10px;
+                    font-size: 13px;
+                }
+            }
+        </style>
+        <script>
+            //Start with first post
+            let counter =1;
+
+            //Load post 20 at a time
+            const quantity = 50;
+
+            //When DOM loads, render the first 20 posts
+            document.addEventListener("DOMContentLoaded", load);
+
+            window.onscroll = () => {
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                    load();
+                }
+            };
+
+            //Load next set of posts
+            function load() {
+
+                // Set start and end post numbers, and update counter
+
+                const start = counter;
+                const end = start + quantity - 1;
+                counter = end + 1;
+
+                // Get new posts and add posts
+                fetch(`/scroll/posts?start=${start}&end=${end}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.posts.forEach(add_post);
+                });
+            };
+
+            // Add a new post whith hiven contents to DOM
+            function add_post(contents) {
+
+                //Create new post
+                const post = document.createElement("div");
+                post.className = "post";
+                post.innerHTML = `${contents} <button class="hide">Hide</button>`;
+
+
+                    // Add fade-out animation
+                    post.style.transition = 'opacity 0.3s ease';
+                    post.style.opacity = '0';
+
+                    document.addEventListener('click', event => {
+                        const element = event.target;
+                        if (element.classList.contains('hide')) {
+                            element.parentElement.style.animationPlayState = 'running';
+                            element.parentElement.addEventListener('animationend', () => {
+                                element.parentElement.remove();
+                            });
+                        }
+                    });
+                    // Add post to DOM
+                    document.querySelector('#posts').append(post);
+            };
+            
+        </script>
+    </head>
+    <body>
+        <div id="posts">
+
+        </div>
+    </body>
+</html>
